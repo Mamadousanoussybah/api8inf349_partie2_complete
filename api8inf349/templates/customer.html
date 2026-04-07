@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="box">
+  <h2>Ajouter les informations client</h2>
+  <p>Cette page appelle l'API <code>PUT /order/&lt;id&gt;</code> avec JavaScript pour mettre à jour les informations de livraison.</p>
+  <form id="customer-form">
+    <label>ID commande <input id="order_id"></label><br>
+    <label>Email <input id="email"></label><br>
+    <label>Pays <input id="country" value="Canada"></label><br>
+    <label>Adresse <input id="address"></label><br>
+    <label>Code postal <input id="postal_code"></label><br>
+    <label>Ville <input id="city"></label><br>
+    <label>Province <input id="province" value="QC"></label><br>
+    <button type="submit">Enregistrer</button>
+  </form>
+  <pre id="result"></pre>
+</div>
+<script>
+document.getElementById('customer-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const orderId = document.getElementById('order_id').value;
+  const payload = {
+    order: {
+      email: document.getElementById('email').value,
+      shipping_information: {
+        country: document.getElementById('country').value,
+        address: document.getElementById('address').value,
+        postal_code: document.getElementById('postal_code').value,
+        city: document.getElementById('city').value,
+        province: document.getElementById('province').value
+      }
+    }
+  };
+
+  const response = await fetch(`/order/${orderId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  let text = '';
+  try {
+    text = await response.text();
+  } catch (e) {}
+  document.getElementById('result').textContent = `HTTP ${response.status}\n${text}`;
+});
+</script>
+{% endblock %}

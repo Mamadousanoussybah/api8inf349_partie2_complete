@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>api8inf349 - Interface HTML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        header {
+            background: #1f4e79;
+            color: white;
+            padding: 20px 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+
+        .alert {
+            display: none;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #1f4e79;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .products-table th,
+        .products-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .products-table th {
+            background: #eef4fb;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 1fr 120px auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input, select, textarea, button {
+            font-size: 1rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #1f4e79;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #163a59;
+        }
+
+        .secondary {
+            background: #6b7280;
+        }
+
+        .secondary:hover {
+            background: #4b5563;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 10px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .inline-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .section-space {
+            margin-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-row {
+                grid-template-columns: 1fr;
+            }
+
+            .inline-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>api8inf349 - Interface HTML</h1>
+</header>
+
+<div class="container">
+    <div id="alertBox" class="alert"></div>
+
+    <div class="grid">
+        <div>
+            <div class="card">
+                <h2>Produits disponibles</h2>
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Prix</th>
+                            <th>Poids</th>
+                            <th>En stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.price }}</td>
+                            <td>{{ product.weight }}</td>
+                            <td>{{ "Oui" if product.in_stock else "Non" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Créer une commande</h2>
+
+                <div id="productLines">
+                    <div class="product-row">
+                        <select class="product-id">
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.id }} - {{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" class="quantity" min="1" value="1" placeholder="Quantité">
+                        <button type="button" class="secondary" onclick="removeLine(this)">Retirer</button>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="secondary" onclick="addLine()">Ajouter un produit</button>
+                    <button type="button" onclick="createOrder()">Créer la commande</button>
+                </div>
+
+                <div class="section-space">
+                    <strong>ID commande créée :</strong>
+                    <span id="createdOrderId">Aucune</span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <h2>Infos client</h2>
+
+                <div class="section-space">
+                    <label for="customerOrderId">ID commande</label>
+                    <input id="customerOrderId" type="number" min="1">
+                </div>
+
+                <div class="section-space">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" placeholder="exemple@email.com">
+                </div>
+
+                <div class="section-space">
+                    <label for="address">Adresse</label>
+                    <input id="address" type="text" placeholder="101 rue Champlain">
+                </div>
+
+                <div class="section-space">
+                    <label for="city">Ville</label>
+                    <input id="city" type="text" placeholder="Chicoutimi">
+                </div>
+
+                <div class="section-space">
+                    <label for="province">Province</label>
+                    <input id="province" type="text" placeholder="QC">
+                </div>
+
+                <div class="section-space">
+                    <label for="postal_code">Code postal</label>
+                    <input id="postal_code" type="text" placeholder="G7J 1W8">
+                </div>
+
+                <div class="section-space">
+                    <label for="country">Pays</label>
+                    <input id="country" type="text" value="Canada">
+                </div>
+
+                <div class="actions">
+                    <button type="button" onclick="saveCustomerInfo()">Enregistrer les infos client</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Payer une commande</h2>
+
+                <div class="section-space">
+                    <label for="paymentOrderId">ID commande</label>
+                    <input id="paymentOrderId" type="number" min="1">
+                </div>
+
+                <div class="section-space">
+                    <label for="cc_name">Nom</label>
+                    <input id="cc_name" type="text" placeholder="John Doe">
+                </div>
+
+                <div class="section-space">
+                    <label for="cc_number">Numéro</label>
+                    <input id="cc_number" type="text" placeholder="4242 4242 4242 4242">
+                </div>
+
+                <div class="section-space">
+                    <label for="cc_month">Mois</label>
+                    <input id="cc_month" type="number" min="1" max="12" value="9">
+                </div>
+
+                <div class="section-space">
+                    <label for="cc_year">Année</label>
+                    <input id="cc_year" type="number" value="2030">
+                </div>
+
+                <div class="section-space">
+                    <label for="cc_cvv">CVV</label>
+                    <input id="cc_cvv" type="text" placeholder="123">
+                </div>
+
+                <div class="actions">
+                    <button type="button" onclick="payOrder()">Lancer le paiement</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Consulter une commande</h2>
+
+                <div class="inline-form">
+                    <div>
+                        <label for="lookupOrderId">ID commande</label>
+                        <input id="lookupOrderId" type="number" min="1">
+                    </div>
+                    <button type="button" onclick="lookupOrder()">Voir</button>
+                </div>
+
+                <div class="section-space">
+                    <strong>Résultat :</strong>
+                    <pre id="lookupResult">Aucune commande chargée.</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAlert(message, type = "success") {
+        const box = document.getElementById("alertBox");
+        box.className = "alert " + type;
+        box.textContent = message;
+        box.style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function addLine() {
+        const container = document.getElementById("productLines");
+        const firstRow = container.querySelector(".product-row");
+        const newRow = firstRow.cloneNode(true);
+        newRow.querySelector(".quantity").value = 1;
+        container.appendChild(newRow);
+    }
+
+    function removeLine(button) {
+        const container = document.getElementById("productLines");
+        if (container.querySelectorAll(".product-row").length > 1) {
+            button.parentElement.remove();
+        }
+    }
+
+    async function createOrder() {
+        const rows = document.querySelectorAll(".product-row");
+        const products = [];
+
+        rows.forEach(row => {
+            const id = row.querySelector(".product-id").value;
+            const quantity = row.querySelector(".quantity").value;
+            if (id && quantity) {
+                products.push({
+                    id: parseInt(id),
+                    quantity: parseInt(quantity)
+                });
+            }
+        });
+
+        try {
+            const response = await fetch("/order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ products })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showAlert("Erreur lors de la création de la commande.", "error");
+                return;
+            }
+
+            const orderId = data.order.id;
+            document.getElementById("createdOrderId").textContent = orderId;
+            document.getElementById("customerOrderId").value = orderId;
+            document.getElementById("paymentOrderId").value = orderId;
+            document.getElementById("lookupOrderId").value = orderId;
+
+            showAlert("Commande créée avec succès. ID : " + orderId, "success");
+            document.getElementById("lookupResult").textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+            showAlert("Erreur réseau lors de la création de la commande.", "error");
+        }
+    }
+
+    async function saveCustomerInfo() {
+    const orderId = document.getElementById("customerOrderId").value;
+       if (!orderId) {
+        showAlert("Veuillez entrer un ID de commande pour les infos client.", "error");
+        return;
+      }
+
+      const payload = {
+        order: {
+            email: document.getElementById("email").value,
+            shipping_information: {
+                address: document.getElementById("address").value,
+                city: document.getElementById("city").value,
+                province: document.getElementById("province").value,
+                postal_code: document.getElementById("postal_code").value,
+                country: document.getElementById("country").value
+            }
+        }
+      };
+
+      try {
+        const response = await fetch(`/order/${orderId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const text = await response.text();
+        let data = null;
+        try {
+            data = JSON.parse(text);
+        } catch (_) {}
+
+        if (!response.ok) {
+            showAlert(
+                "Erreur lors de l'enregistrement des infos client. " +
+                (text || `HTTP ${response.status}`),
+                "error"
+            );
+            return;
+        }
+
+        showAlert("Informations du client enregistrées avec succès.", "success");
+
+        if (data) {
+            document.getElementById("lookupResult").textContent =
+                JSON.stringify(data, null, 2);
+        }
+        } catch (error) {
+          showAlert("Erreur réseau lors de l'enregistrement des infos client.", "error");
+          }
+   }
+
+    async function payOrder() {
+        const orderId = document.getElementById("paymentOrderId").value;
+        if (!orderId) {
+            showAlert("Veuillez entrer un ID de commande à payer.", "error");
+            return;
+        }
+
+        const payload = {
+            credit_card: {
+                name: document.getElementById("cc_name").value,
+                number: document.getElementById("cc_number").value,
+                expiration_month: parseInt(document.getElementById("cc_month").value),
+                expiration_year: parseInt(document.getElementById("cc_year").value),
+                cvv: document.getElementById("cc_cvv").value
+            }
+        };
+
+        try {
+            const response = await fetch(`/order/${orderId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.status === 202) {
+                showAlert("Commande envoyée au paiement avec succès.", "success");
+
+                setTimeout(async () => {
+                    await lookupOrder();
+                }, 1200);
+
+                return;
+            }
+
+            if (response.status === 409) {
+                showAlert("Cette commande est déjà en cours de traitement ou déjà payée.", "error");
+                return;
+            }
+
+            const text = await response.text();
+            showAlert("Paiement refusé ou erreur. Réponse : " + text, "error");
+        } catch (error) {
+            showAlert("Erreur réseau lors du paiement.", "error");
+        }
+    }
+
+    async function lookupOrder() {
+        const orderId = document.getElementById("lookupOrderId").value;
+        if (!orderId) {
+            showAlert("Veuillez entrer un ID de commande à consulter.", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/order/${orderId}`);
+
+            if (response.status === 202) {
+                document.getElementById("lookupResult").textContent =
+                    "Commande en cours de paiement...";
+                return;
+            }
+
+            const data = await response.json();
+            document.getElementById("lookupResult").textContent = JSON.stringify(data, null, 2);
+
+            if (data.order && data.order.paid === true && data.order.transaction && data.order.transaction.success === true) {
+                showAlert("Commande payée avec succès.", "success");
+            }
+        } catch (error) {
+            showAlert("Erreur réseau lors de la consultation.", "error");
+        }
+    }
+</script>
+</body>
+</html>

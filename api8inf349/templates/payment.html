@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="box">
+  <h2>Payer une commande</h2>
+  <p>Cette page appelle l'API <code>PUT /order/&lt;id&gt;</code> avec JavaScript.</p>
+  <form id="payment-form">
+    <label>ID commande <input name="order_id" id="order_id"></label><br>
+    <label>Nom <input name="name" id="name"></label><br>
+    <label>Numéro <input name="number" id="number" value="4242 4242 4242 4242"></label><br>
+    <label>Mois <input name="expiration_month" id="expiration_month" value="9"></label><br>
+    <label>Année <input name="expiration_year" id="expiration_year" value="2030"></label><br>
+    <label>CVV <input name="cvv" id="cvv" value="123"></label><br>
+    <button type="submit">Lancer le paiement</button>
+  </form>
+  <pre id="result"></pre>
+</div>
+<script>
+document.getElementById('payment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const orderId = document.getElementById('order_id').value;
+  const payload = {
+    credit_card: {
+      name: document.getElementById('name').value,
+      number: document.getElementById('number').value,
+      expiration_month: parseInt(document.getElementById('expiration_month').value, 10),
+      expiration_year: parseInt(document.getElementById('expiration_year').value, 10),
+      cvv: document.getElementById('cvv').value
+    }
+  };
+
+  const response = await fetch(`/order/${orderId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  let text = '';
+  try {
+    text = await response.text();
+  } catch (e) {}
+  document.getElementById('result').textContent = `HTTP ${response.status}\n${text}`;
+});
+</script>
+{% endblock %}

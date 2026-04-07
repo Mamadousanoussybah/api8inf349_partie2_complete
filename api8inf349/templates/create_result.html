@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="box">
+  <h2>Résultat création commande</h2>
+  {% if error %}
+    <pre>{{ error | tojson(indent=2) }}</pre>
+  {% else %}
+    <p>Commande créée avec succès.</p>
+    <p>ID de commande: <strong>{{ order.id }}</strong></p>
+    <p>Route API: <code>/order/{{ order.id }}</code></p>
+  {% endif %}
+</div>
+{% endblock %}

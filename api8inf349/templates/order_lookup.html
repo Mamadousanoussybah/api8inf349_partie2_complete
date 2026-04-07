@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="box">
+  <h2>Consulter une commande</h2>
+  <form method="get" action="/ui/order">
+    <label>ID commande <input name="order_id" value="{{ order_id or '' }}"></label>
+    <button type="submit">Voir</button>
+  </form>
+
+  {% if order_id %}
+    <h3>Résultat</h3>
+    <p>État: {{ status }}</p>
+    {% if result %}
+      <pre>{{ result | tojson(indent=2) }}</pre>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
