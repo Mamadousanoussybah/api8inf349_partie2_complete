@@ -1,5 +1,5 @@
 services:
-  app:
+  api8inf349:
     build: .
     container_name: api8inf349_app
     ports:
@@ -18,7 +18,21 @@ services:
       - postgres
       - redis
     command: python -m flask run --host=0.0.0.0 --port=5000
-
+  worker:
+    build: .
+    container_name: api8inf349_worker
+    environment:
+      FLASK_APP: api8inf349
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: api8inf349
+      DB_USER: user
+      DB_PASSWORD: pass
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    command: python -m flask worker
   postgres:
     image: postgres:12
     container_name: api8inf349_postgres
